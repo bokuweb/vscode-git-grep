@@ -24,11 +24,11 @@ export function activate(context: ExtensionContext) {
                 }
                 const lines = stdout.split(/\n/).filter(l => l !== '');
                 const items: QuickPickItemWithPath[] = lines.map(l => {
-                    const [fullPath, line, desc] = l.split(':');
+                    const [fullPath, line, ...desc] = l.split(':');
                     const path = fullPath.split('/');
                     return {
                         label: `${path[path.length - 1]} : ${line}`,
-                        description: desc,
+                        description: desc.join(':'),
                         fullPath: l,
                     };
                 });
