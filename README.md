@@ -2,8 +2,9 @@
 
 ## Features
 
-## Requirements
+Git grep extension for Visual Studio Code.
 
+![screenshot](https://github.com/bokuweb/vscode-git-grep/blob/master/docs/screenshot.gif?raw=true)
 
 ## Extension Settings
 

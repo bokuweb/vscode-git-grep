@@ -5,7 +5,7 @@ import { quote } from 'shell-quote';
 import { window, commands, ExtensionContext, workspace, Selection, QuickPickItem, QuickPickOptions } from 'vscode';
 
 interface QuickPickItemWithPath extends QuickPickItem {
-    fullpath?: string;
+    fullPath?: string;
 }
 
 const projectRoot = workspace.rootPath ? workspace.rootPath : '.';
@@ -17,42 +17,40 @@ export function activate(context: ExtensionContext) {
             const query = await window.showInputBox({ prompt: 'Please input search word.' })
             const command = quote(['git', 'grep', '-H', '-n', query]);
 
-            exec(command, { cwd: projectRoot }, async (err, stdout, stderr) => {
-                if (stderr) {
-                    window.showErrorMessage(stderr);
-                    return Promise.resolve();
-                }
-                const lines = stdout.split(/\n/).filter(l => l !== '');
-                const items: QuickPickItemWithPath[] = lines.map(l => {
-                    const [fullPath, line, ...desc] = l.split(':');
-                    const path = fullPath.split('/');
-                    return {
-                        label: `${path[path.length - 1]} : ${line}`,
-                        description: desc.join(':'),
-                        fullPath: l,
-                    };
-                });
-                if (!lines.length) {
-                    window.showInformationMessage('There are no items')
-                    return Promise.resolve();
-                }
-                let item;
-                try {
-                    const options: QuickPickOptions = {
-                        matchOnDescription: true,
+            const fetchItems = (): Promise<QuickPickItemWithPath[]> => new Promise((resolve, reject) => {
+                exec(command, { cwd: projectRoot }, (err, stdout, stderr) => {
+                    if (stderr) {
+                        window.showErrorMessage(stderr);
+                        return resolve([]);
                     }
-                    item = await window.showQuickPick(items, options);
-                } catch (e) {
-                    window.showErrorMessage(e);
-                }
+                    const lines = stdout.split(/\n/).filter(l => l !== '');
+                    if (!lines.length) {
+                        window.showInformationMessage('There are no items')
+                        return resolve([]);
+                    }
+                    return resolve(lines.map(l => {
+                        const [fullPath, line, ...desc] = l.split(':');
+                        const path = fullPath.split('/');
+                        return {
+                            label: `${path[path.length - 1]} : ${line}`,
+                            description: desc.join(':'),
+                            fullPath: l,
+                        };
+                    }));
 
-                const [file, line] = item.fullPath.split(':');
-                const doc = await workspace.openTextDocument(projectRoot + '/' + file);
-                await window.showTextDocument(doc);
-                window.activeTextEditor.selection = new Selection(~~line, 0, ~~line, 0);
-                commands.executeCommand('cursorUp');
-                context.subscriptions.push(disposable);
+                });
             });
+
+            const options: QuickPickOptions = {
+                matchOnDescription: true,
+            };
+            const item = await window.showQuickPick(fetchItems(), options);
+            const [file, line] = item.fullPath.split(':');
+            const doc = await workspace.openTextDocument(projectRoot + '/' + file);
+            await window.showTextDocument(doc);
+            window.activeTextEditor.selection = new Selection(~~line, 0, ~~line, 0);
+            commands.executeCommand('cursorUp');
+            context.subscriptions.push(disposable);
         });
     })().catch((error) => {
         window.showErrorMessage(error);
