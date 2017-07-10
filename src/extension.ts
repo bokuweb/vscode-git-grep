@@ -10,6 +10,7 @@ interface QuickPickItemWithPath extends QuickPickItem {
 
 const projectRoot = workspace.rootPath ? workspace.rootPath : '.';
 
+console.log(projectRoot)
 export function activate(context: ExtensionContext) {
 
     (async () => {
@@ -25,7 +26,7 @@ export function activate(context: ExtensionContext) {
                     }
                     const lines = stdout.split(/\n/).filter(l => l !== '');
                     if (!lines.length) {
-                        window.showInformationMessage('There are no items')
+                        window.showInformationMessage('There are no items.')
                         return resolve([]);
                     }
                     return resolve(lines.map(l => {
@@ -41,10 +42,9 @@ export function activate(context: ExtensionContext) {
                 });
             });
 
-            const options: QuickPickOptions = {
-                matchOnDescription: true,
-            };
+            const options: QuickPickOptions = { matchOnDescription: true };
             const item = await window.showQuickPick(fetchItems(), options);
+            if (!item) return;
             const [file, line] = item.fullPath.split(':');
             const doc = await workspace.openTextDocument(projectRoot + '/' + file);
             await window.showTextDocument(doc);
