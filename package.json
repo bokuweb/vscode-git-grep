@@ -19,8 +19,7 @@
   },
   "icon": "docs/logo.png",
   "categories": [
-    "Other",
-    "git"
+    "Other"
   ],
   "activationEvents": [
     "onCommand:extension.gitGrep"
