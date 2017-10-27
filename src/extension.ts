@@ -10,16 +10,13 @@ interface QuickPickItemWithPath extends QuickPickItem {
 
 const projectRoot = workspace.rootPath ? workspace.rootPath : '.';
 
-console.log(projectRoot)
 export function activate(context: ExtensionContext) {
-
     (async () => {
         const disposable = commands.registerCommand('extension.gitGrep', async () => {
             const query = await window.showInputBox({ prompt: 'Please input search word.' })
-            const command = quote(['git', 'grep', '-H', '-n', query]);
-
+            const command = quote(['git', 'grep', '-H', '-n', '-e', query]);
             const fetchItems = (): Promise<QuickPickItemWithPath[]> => new Promise((resolve, reject) => {
-                exec(command, { cwd: projectRoot }, (err, stdout, stderr) => {
+                exec(command, { cwd: projectRoot, maxBuffer: 2000 * 1024 }, (err, stdout, stderr) => {
                     if (stderr) {
                         window.showErrorMessage(stderr);
                         return resolve([]);
@@ -41,7 +38,6 @@ export function activate(context: ExtensionContext) {
 
                 });
             });
-
             const options: QuickPickOptions = { matchOnDescription: true };
             const item = await window.showQuickPick(fetchItems(), options);
             if (!item) return;

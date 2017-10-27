@@ -2,7 +2,7 @@
   "name": "vscode-git-grep",
   "displayName": "vscode-git-grep",
   "description": "git grep for vscode",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "bokuweb",
   "engines": {
     "vscode": "^1.6.0"
@@ -47,6 +47,7 @@
     "@types/mocha": "^2.2.32"
   },
   "dependencies": {
+    "shell-escape": "^0.2.0",
     "shell-quote": "^1.6.1"
   }
 }
