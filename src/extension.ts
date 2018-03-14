@@ -32,6 +32,7 @@ export function activate(context: ExtensionContext) {
                         return {
                             label: `${path[path.length - 1]} : ${line}`,
                             description: desc.join(':'),
+                            detail: fullPath,
                             fullPath: l,
                         };
                     }));
