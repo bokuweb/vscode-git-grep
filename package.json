@@ -40,11 +40,11 @@
     "test": "node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
-    "typescript": "^2.3.0",
-    "vscode": "^1.0.0",
-    "mocha": "^2.3.3",
+    "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
-    "@types/mocha": "^2.2.32"
+    "mocha": "^2.3.3",
+    "typescript": "^2.3.0",
+    "vscode": "^1.0.0"
   },
   "dependencies": {
     "shell-escape": "^0.2.0",

@@ -13,7 +13,20 @@ const projectRoot = workspace.rootPath ? workspace.rootPath : '.';
 export function activate(context: ExtensionContext) {
     (async () => {
         const disposable = commands.registerCommand('extension.gitGrep', async () => {
-            const query = await window.showInputBox({ prompt: 'Please input search word.' })
+            // Get the current editor
+            let wordText = ''
+            let editor = window.activeTextEditor;
+            if (editor) {
+                // Get word under cursor position
+                let wordRange = editor.document.getWordRangeAtPosition(editor.selection.start);
+                if (!wordRange) {
+                    wordText = '';
+                }
+                // Get word text
+                wordText = editor.document.getText(wordRange);
+            }
+
+            const query = await window.showInputBox({ prompt: 'Please input search word.', value: wordText })
             const command = quote(['git', 'grep', '-H', '-n', '-e', query]);
             const fetchItems = (): Promise<QuickPickItemWithPath[]> => new Promise((resolve, reject) => {
                 exec(command, { cwd: projectRoot, maxBuffer: 2000 * 1024 }, (err, stdout, stderr) => {
